@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="renderer" content="webkit">
+<title>用户管理-修改信息</title>
+<link rel="stylesheet" href="css/pintuer.css">
+<link rel="stylesheet" href="css/admin.css">
+<script src="js/jquery.js"></script>
+<script src="js/pintuer.js"></script>
+</head>
+<body>
+<div class="panel admin-panel margin-top">
+  <div class="panel-head" id="add"><strong><span class="icon-pencil-square-o"></span>用户管理-修改信息</strong></div>
+  <div class="body-content">
+    <form method="post" class="form-x" action="">      
+      <div class="form-group">
+        <div class="label">
+          <label>loginId</label>
+        </div>
+        <div class="field">
+          <input type="text" class="input w80" name="loginId" id="loginId"/>
+          <div class="tips"></div>
+        </div>
+      </div> 
+      <div class="form-group">
+        <div class="label">
+          <label>loginPwd</label>
+        </div>
+        <div class="field">
+          <input type="text" class="input w80" name="loginPwd" id="loginPwd"/>
+          <div class="tips"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="label">
+          <label>email</label>
+        </div>
+        <div class="field">
+          <input type="text" class="input w80" name="email" id="email"/>
+          <div class="tips"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="label">
+          <label>status</label>
+        </div>
+        <div class="field">
+          <div class="button-group radio">
+            <label class="button active">
+              <span class="icon icon-check"></span>
+              <input name="state" value="正常" type="radio" checked="checked">正常
+            </label>
+            <label class="button">
+              <span class="icon icon-times"></span>
+              <input name="state" value="停用" type="radio">停用
+            </label>
+            <p id="state">default</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="label">
+          <label>code</label>
+        </div>
+        <div class="field">
+          <div class="button-group-big radio">
+            <label class="button">
+              <span class="icon icon-apple"></span>
+              <input name="code" value="apple" type="radio" checked="checked">apple
+            </label>
+            <label class="button">
+              <span class="icon icon-android"></span>
+              <input name="code" value="android" type="radio">android
+            </label>
+            <label class="button">
+              <span class="icon icon-windows"></span>
+              <input name="code" value="windows" type="radio">windows
+            </label>
+            <label class="button">
+              <span class="icon icon-linux"></span>
+              <input name="code" value="linux" type="radio">linux
+            </label>
+            <p id="code">default</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="label">
+          <label></label>
+        </div>
+        <div class="field">
+          <button class="button bg-main icon-check-square-o" type="submit" id="editButton">更新信息</button>
+          <a class="button bg-main icon-check-square-o" type="submit" href="user_list.html">返回</a>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const thisId = urlParams.get("id");
+
+  $.ajax({
+    url: "http://localhost:8080/user/selectUser",
+    type: "GET",
+    data: {id: thisId},
+    dataType: "JSON",
+    success: function (response){
+      if (response.code === 200){
+        var user = response.data;
+        $("#loginId").val(user.loginId);
+        $("#loginPwd").val(user.loginPwd);
+        $("#email").val(user.email);
+        $("#state").text("当前值："+user.state);
+        $("#code").text("当前值："+user.code);
+      }
+    }
+  });
+
+  $("#editButton").on("click", function() {
+
+    var updateUser = {
+      id: thisId,
+      loginId: $("#loginId").val(),
+      loginPwd: $("#loginPwd").val(),
+      email: $("#email").val(),
+      state: $("input[name='state']:checked").val(),
+      code: $("input[name='code']:checked").val()
+    };
+    $.ajax({
+      url: "http://localhost:8080/user/updateUser",
+      type: "PUT",
+      contentType: "application/json",  // 设置内容类型为JSON
+      data: JSON.stringify(updateUser),   // 将数据转换为JSON格式
+      dataType: "JSON",
+    })
+
+
+  });
+
+</script>
+
+</body>
+</html>

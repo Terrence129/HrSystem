@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>jQuery实现数据交互</title>
+</head>
+<body>
+<h1>jQuery实现数据交互</h1>
+
+<!-- 获取数据按钮和展示 -->
+<input type="button" value="获取数据" id="btn1">
+<p>响应数据如下：</p>
+<ul id="dataList"></ul>
+
+<hr>
+
+<!-- 提交数据输入框和按钮 -->
+<input type="text" id="text1" name="text1" placeholder="输入数据">
+<input type="button" value="提交数据" id="btn2">
+<p>文本框返回内容：</p>
+<ul id="paramData"></ul>
+
+<!-- 引用jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+<!-- 使用jQuery -->
+<script>
+  $(function (){
+    // 获取数据并显示
+    $("#btn1").on("click", function (){
+      $("#dataList").empty();  // 清空旧数据
+      $.ajax({
+        url: "http://localhost:8080/test/list",  // 替换为你的API地址
+        type: "GET",
+        dataType: "JSON",  // 期望返回JSON格式的数据
+        success: function (result) {
+          console.log(result);  // 打印返回的结果
+          // 遍历数据并插入到页面的ul列表中
+          $.each(result, function (index, item) {
+            let li_data = `<li>${item}</li>`;  // 每个项显示在li标签中
+            $("#dataList").append(li_data);  // 追加到ul列表中
+          });
+        }
+      });
+    });
+
+    // 提交文本框中的数据并显示返回结果
+    $("#btn2").on("click", function (){
+      $("#paramData").empty();  // 清空旧的返回内容
+      $.ajax({
+        url: "http://localhost:8080/test/param1",  // 替换为你的API地址
+        type: "GET",
+        data: { name: $("#text1").val() },  // 提交用户输入的文本数据
+        dataType: "text",  // 期望返回文本
+        success: function (result) {
+          console.log(result);  // 打印返回的结果
+          // 显示服务器返回的文本内容
+          $("#paramData").html(result);
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>

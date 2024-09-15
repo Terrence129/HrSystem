@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="renderer" content="webkit">
+    <title>用户管理-增加用户</title>
+    <link rel="stylesheet" href="css/pintuer.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="js/jquery.js"></script>
+    <script src="js/pintuer.js"></script>
+</head>
+<body>
+
+<div class="panel admin-panel">
+    <div class="panel-head" id="add"><strong><span class="icon-pencil-square-o"></span>用户管理-增加用户</strong></div>
+    <div class="body-content">
+        <form id="user_form" class="form-x">
+            <div class="form-group">
+                <div class="label">
+                    <label for="loginId">loginId</label>
+                </div>
+                <div class="field">
+                    <input type="text" class="input w80" id="loginId" name="loginId" required placeholder="请输入登录名称"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="label">
+                    <label for="loginPwd">loginPwd</label>
+                </div>
+                <div class="field">
+                    <input type="password" class="input w80" id="loginPwd" name="loginPwd" required placeholder="请输入密码"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="label">
+                    <label for="email">email</label>
+                </div>
+                <div class="field">
+                    <input type="email" class="input w80" id="email" name="email" required placeholder="请输入邮箱"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="label">
+                    <label>status</label>
+                </div>
+                <div class="field">
+                    <div class="button-group radio">
+                        <label class="button active">
+                            <span class="icon icon-check"></span>
+                            <input name="state" value="正常" type="radio" checked="checked">正常
+                        </label>
+                        <label class="button">
+                            <span class="icon icon-times"></span>
+                            <input name="state" value="停用" type="radio">停用
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="label">
+                    <label>code</label>
+                </div>
+                <div class="field">
+                    <div class="button-group-big radio">
+                        <label class="button">
+                            <span class="icon icon-apple"></span>
+                            <input name="code" value="apple" type="radio">apple
+                        </label>
+                        <label class="button">
+                            <span class="icon icon-android"></span>
+                            <input name="code" value="android" type="radio">android
+                        </label>
+                        <label class="button">
+                            <span class="icon icon-windows"></span>
+                            <input name="code" value="windows" type="radio">windows
+                        </label>
+                        <label class="button">
+                            <span class="icon icon-linux"></span>
+                            <input name="code" value="linux" type="radio">linux
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="field">
+                    <button id="submitBtn" class="button bg-main icon-check-square-o" type="button"> 添加</button>
+                    <button class="button bg-main icon-check-square-o" type="button" onclick="javascript:history.back();"> 返回</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        // 阻止默认提交，并使用AJAX提交表单
+        $("#submitBtn").on("click", function () {
+            var newUser = {
+                loginId: $("#loginId").val(),
+                loginPwd: $("#loginPwd").val(),
+                email: $("#email").val(),
+                state: $("input[name='state']:checked").val(),
+                code: $("input[name='code']:checked").val()
+            };
+
+            $.ajax({
+                url: "http://localhost:8080/user/add",
+                type: "POST",
+                contentType: "application/json",  // 设置内容类型为JSON
+                data: JSON.stringify(newUser),   // 将数据转换为JSON格式
+                success: function (response) {
+                    alert("用户添加成功！");
+                    window.location.replace("user_list.html")
+                },
+                error: function (xhr, status, error) {
+                    alert("用户添加失败：" + error);
+                }
+            });
+        });
+    });
+
+</script>
+
+</body>
+</html>
