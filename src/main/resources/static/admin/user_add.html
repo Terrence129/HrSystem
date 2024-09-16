@@ -109,10 +109,11 @@
             };
 
             $.ajax({
-                url: "http://localhost:8080/user/add",
+                url: "http://localhost:8080/user/addUser",
                 type: "POST",
                 contentType: "application/json",  // 设置内容类型为JSON
                 data: JSON.stringify(newUser),   // 将数据转换为JSON格式
+                dataType: "JSON",
                 success: function (response) {
                     alert("用户添加成功！");
                     window.location.replace("user_list.html")

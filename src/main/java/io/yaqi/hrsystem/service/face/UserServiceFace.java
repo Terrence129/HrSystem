@@ -1,9 +1,16 @@
 package io.yaqi.hrsystem.service.face;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.yaqi.hrsystem.dao.entity.User;
 import io.yaqi.hrsystem.dao.mapper.UserMapper;
+import io.yaqi.hrsystem.entity.req.UserLoginReq;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import javax.security.auth.login.LoginException;
+import java.util.List;
 
 /**
  * @author chenyaqi
@@ -39,5 +46,19 @@ public class UserServiceFace {
     public Object deleteUser(Integer userId) {
         userMapper.deleteById(userId);
         return userId + " has been deleted";
+    }
+
+    public Object userLogin(UserLoginReq req) throws LoginException {
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User ::getLoginId, req.getLoginId());
+        List<User> userList = userMapper.selectList(queryWrapper);
+        if(userList.size() != 1){
+            throw new LoginException("不存在此账号");
+        }
+        User user = userList.get(0);
+        if (!user.getLoginPwd().equals(req.getLoginPwd())){
+            throw new LoginException("密码错误");
+        }
+        return user;
     }
 }

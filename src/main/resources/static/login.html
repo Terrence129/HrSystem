@@ -19,28 +19,58 @@
             <div style="height:150px;"></div>
             <div class="media media-y margin-big-bottom">           
             </div>         
-            <form action="admin/index.html" method="post">
-            <div class="panel loginbox">
-                <div class="text-center margin-big padding-big-top"><h1>企业人力资源管理</h1></div>
-                <div class="panel-body" style="padding:30px; padding-bottom:10px; padding-top:10px;">
-                    <div class="form-group">
-                        <div class="field field-icon-right">
-                            <input type="text" class="input input-big" name="name" placeholder="登录账号" data-validate="required:请填写账号" />
-                            <span class="icon icon-user margin-small"></span>
+            <form>
+                <div class="panel loginbox">
+                    <div class="text-center margin-big padding-big-top"><h1>企业人力资源管理</h1></div>
+                    <div class="panel-body" style="padding:30px; padding-bottom:10px; padding-top:10px;">
+                        <div class="form-group">
+                            <div class="field field-icon-right">
+                                <input type="text" class="input input-big" name="name" placeholder="登录账号" data-validate="required:请填写账号" id="loginId"/>
+                                <span class="icon icon-user margin-small"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="field field-icon-right">
+                                <input type="password" class="input input-big" name="password" placeholder="登录密码" data-validate="required:请填写密码" id="loginPwd"/>
+                                <span class="icon icon-key margin-small"></span>
+                            </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="field field-icon-right">
-                            <input type="password" class="input input-big" name="password" placeholder="登录密码" data-validate="required:请填写密码" />
-                            <span class="icon icon-key margin-small"></span>
-                        </div>
-                    </div>                   
+                    <div style="padding:30px;"><input type="submit" class="button button-block bg-main text-big input-big" value="登录" id="loginButton"></div>
                 </div>
-                <div style="padding:30px;"><input type="submit" class="button button-block bg-main text-big input-big" value="登录"></div>
-            </div>
             </form>          
         </div>
     </div>
 </div>
+
+<script>
+    $("#loginButton").on("click", function (event) {
+
+        event.preventDefault();
+        var loginReq = {
+            loginId: $("#loginId").val(),
+            loginPwd: $("#loginPwd").val()
+        }
+        console.log(loginReq)
+
+        $.ajax({
+            url: "http://localhost:8080/user/login",
+            type: "POST",
+            contentType: "application/json",  // 设置内容类型为JSON
+            data: JSON.stringify(loginReq),   // 将数据转换为JSON格式
+            dataType: "JSON",
+            success: function (response) {
+                console.log("试图登陆" + response.data + response.msg)
+                alert(response.msg)
+                if (response.code === 200){
+                    window.location.replace(`admin/index.html?username=${response.data.loginId}`)
+                }
+            },
+            error: function () {
+                alert("请求失败")
+            }
+        })
+    })
+</script>
 </body>
 </html>

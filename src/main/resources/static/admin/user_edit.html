@@ -126,7 +126,7 @@
   });
 
   $("#editButton").on("click", function() {
-
+    event.preventDefault();  // 阻止表单的默认提交行为
     var updateUser = {
       id: thisId,
       loginId: $("#loginId").val(),
@@ -142,7 +142,7 @@
       data: JSON.stringify(updateUser),   // 将数据转换为JSON格式
       dataType: "JSON",
     })
-
+    window.location.replace("user_list.html")
 
   });
 
