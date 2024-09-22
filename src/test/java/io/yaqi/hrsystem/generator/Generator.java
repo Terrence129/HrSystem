@@ -4,6 +4,7 @@ package io.yaqi.hrsystem.generator;
 import com.baomidou.mybatisplus.generator.FastAutoGenerator;
 import com.baomidou.mybatisplus.generator.config.OutputFile;
 import com.baomidou.mybatisplus.generator.config.TemplateType;
+import com.sun.org.apache.xalan.internal.xsltc.compiler.Template;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,7 +41,7 @@ public class Generator {
     public static void main(String[] args) {
 
         // 传入需要生成的表名，多个用英文逗号分隔，所有用 all 表示
-        genCode("all");
+        genCode("position_info");
 
     }
 
@@ -63,10 +64,10 @@ public class Generator {
                 })
                 // 包配置
                 .packageConfig(builder -> builder.parent(BASE_PACKAGE) // 设置父包名
-                        .entity("dao.entity")
+                        .entity("entity.po")
                         .service("service")
                         .serviceImpl("service.impl")
-                        .mapper("dao.mapper")
+                        .mapper("dao")
                         .controller("controller.front")
                         .pathInfo(Collections.singletonMap(OutputFile.mapperXml, PROJECT_PATH + RESOURCE_PATH + "/mapper")))
                 // 模版配置

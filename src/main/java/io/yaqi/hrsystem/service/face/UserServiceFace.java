@@ -1,11 +1,10 @@
 package io.yaqi.hrsystem.service.face;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.yaqi.hrsystem.dao.entity.User;
-import io.yaqi.hrsystem.dao.mapper.UserMapper;
+import io.yaqi.hrsystem.entity.po.User;
+import io.yaqi.hrsystem.dao.UserMapper;
 import io.yaqi.hrsystem.entity.req.UserLoginReq;
+import io.yaqi.hrsystem.entity.req.UserReq;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +24,15 @@ public class UserServiceFace {
 
     private final UserMapper userMapper;
 
-    public Object addUser(User user) {
+    public Object addUser(UserReq req) {
+        User user = new User();
+        user.setLoginId(req.getLoginId());
+        user.setLoginPwd(req.getLoginPwd());
+        user.setEmail(req.getEmail());
+        user.setState(req.getState());
+        user.setCode("测试中");
+        user.setRoleId(req.getRoleId());
+        user.setDeptId(req.getDeptId());
         userMapper.insert(user);
         return user;
     }
@@ -60,5 +67,14 @@ public class UserServiceFace {
             throw new LoginException("密码错误");
         }
         return user;
+    }
+
+    // 利用多表查询技术实现自定义结果查询
+    public Object getUsersWithObjects(){
+        return userMapper.getUsersWithObjects();
+    }
+
+    public Object selectUserWithObjectsById(Integer id) {
+        return userMapper.selectUserWithObjectsById(id);
     }
 }

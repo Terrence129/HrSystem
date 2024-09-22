@@ -19,8 +19,15 @@ import javax.security.auth.login.LoginException;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(Throwable.class)
+    public ResponseResult<Object> handleThrowable(Throwable e) {
+        log.error(e.getMessage());
+        return ResponseResult.fail(null, e.getCause().getMessage(), 500);
+    }
+
+    @ExceptionHandler(LoginException.class)
     public ResponseResult<Object> loginException(LoginException e) {
         log.error(e.getMessage());
         return ResponseResult.fail(null, e.getMessage(), 500);
     }
+
 }

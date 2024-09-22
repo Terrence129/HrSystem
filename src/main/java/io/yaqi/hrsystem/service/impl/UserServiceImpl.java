@@ -1,7 +1,7 @@
 package io.yaqi.hrsystem.service.impl;
 
-import io.yaqi.hrsystem.dao.entity.User;
-import io.yaqi.hrsystem.dao.mapper.UserMapper;
+import io.yaqi.hrsystem.entity.po.User;
+import io.yaqi.hrsystem.dao.UserMapper;
 import io.yaqi.hrsystem.service.UserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;

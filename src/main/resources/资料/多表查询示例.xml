@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hqyj.mapper.UserMapper">
+    <!--配置自定义结果映射-->
+    <resultMap id="UserResult" type="User">
+        <!--设置主关键字-->
+        <id property="id" column="id"/>
+        <!--其它属性映射-->
+        <result property="loginId" column="loginId" />
+        <result property="loginPwd" column="loginPwd" />
+        <!--属性名称和数据库表中的列名相同，则映射resul节点可省略-->
+        <!-- <result property="email" column="email"/>-->
+        <!--配置多对一的关系【重要】-->
+        <!--
+            property:配置的属性名称
+            column:对应关联关系的列名
+            select:通过嵌套查询得到
+            fetchType: lazy懒加载
+        -->
+        <association property="role" column="roleId"
+                     select="com.hqyj.mapper.RoleMapper.findRoleById" fetchType="lazy"
+                     javaType="Role"/>
+        <association property="department" column="deptId"
+                     select="com.hqyj.mapper.DepartmentMapper.findDepartmentById"
+                     fetchType="lazy"
+                     javaType="Department"/>
+    </resultMap>
+    <!--查询所有用户-->
+    <select id="findAllUsers" resultMap="UserResult">
+        SELECT * FROM users
+    </select>
+
+    <!--添加用户-->
+    <insert id="addUser" parameterType="User">
+        INSERT INTO users(loginId,loginPwd,email,state,code,roleId,deptId)
+        VALUES(#{loginId},#{loginPwd},#{email},#{state},#{code},#{role.id},#{department.id})
+    </insert>
+
+    <!--修改用户-->
+    <update id="updateUser" parameterType="User">
+        UPDATE users
+        <set>
+            <if test="loginId!=null">loginId=#{loginId},</if>
+            <if test="loginPwd!=null">loginPwd=#{loginPwd},</if>
+            <if test="email!=null">email=#{email},</if>
+            <if test="state!=null">state=#{state},</if>
+            <if test="code!=null">code=#{code},</if>
+            <if test="role!=null">roleId=#{role.id},</if>
+            <if test="department!=null">deptId=#{department.id}</if>
+        </set>
+        WHERE id=#{id}
+    </update>
+
+    <!--根据用户编号获取用户-->
+    <select id="findUserById" resultMap="UserResult">
+        SELECT * FROM users WHERE id=#{id}
+    </select>
+
+    <!--根据用户编号删除用户-->
+    <delete id="deleteUserById">
+        DELETE FROM users WHERE id=#{id}
+    </delete>
+</mapper>

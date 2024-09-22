@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="renderer" content="webkit">
+    <title>角色管理-增加角色</title>
+    <link rel="stylesheet" href="css/pintuer.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="js/jquery.js"></script>
+    <script src="js/pintuer.js"></script>
+</head>
+<body>
+
+<div class="panel admin-panel">
+    <div class="panel-head" id="add"><strong><span class="icon-pencil-square-o"></span>角色管理-增加角色</strong></div>
+    <div class="body-content">
+        <form id="user_form" class="form-x">
+            <div class="form-group">
+                <div class="label">
+                    <label for="name">name</label>
+                </div>
+                <div class="field">
+                    <input type="text" class="input w80" id="name" name="name" required placeholder="请输入角色名称"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="label">
+                    <label for="description">description</label>
+                </div>
+                <div class="field">
+                    <input type="text" class="input w80" id="description" name="description" required placeholder="请输入角色简述"/>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="label">
+                    <label>status</label>
+                </div>
+                <div class="field">
+                    <div class="button-group radio">
+                        <label class="button active">
+                            <span class="icon icon-check"></span>
+                            <input name="state" value="正常" type="radio" checked="checked">正常
+                        </label>
+                        <label class="button">
+                            <span class="icon icon-times"></span>
+                            <input name="state" value="停用" type="radio">停用
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+
+            <div class="form-group">
+                <div class="field">
+                    <button id="submitBtn" class="button bg-main icon-check-square-o" type="button"> 添加</button>
+                    <button class="button bg-main icon-check-square-o" type="button" onclick="javascript:history.back();"> 返回</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        // 阻止默认提交，并使用AJAX提交表单
+        $("#submitBtn").on("click", function () {
+            var newRole = {
+                name: $("#name").val(),
+                description: $("#description").val(),
+                state: $("input[name='state']:checked").val(),
+            };
+
+            $.ajax({
+                url: "http://localhost:8080/role/addRole",
+                type: "POST",
+                contentType: "application/json",  // 设置内容类型为JSON
+                data: JSON.stringify(newRole),   // 将数据转换为JSON格式
+                dataType: "JSON",
+                success: function (response) {
+                    alert("角色添加成功！");
+                    window.location.replace("role_list.html")
+                },
+                error: function (xhr, status, error) {
+                    alert("角色添加失败：" + error);
+                }
+            });
+        });
+    });
+
+</script>
+
+</body>
+</html>

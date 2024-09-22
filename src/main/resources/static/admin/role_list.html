@@ -5,7 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="renderer" content="webkit">
-  <title>用户管理</title>
+  <title>角色管理</title>
   <link rel="stylesheet" href="css/pintuer.css">
   <link rel="stylesheet" href="css/admin.css">
   <script src="js/jquery.js"></script>
@@ -13,31 +13,13 @@
 </head>
 <body>
 <div class="panel admin-panel">
-  <div class="panel-head"><strong class="icon-reorder">用户管理</strong></div>
+  <div class="panel-head"><strong class="icon-reorder">角色管理</strong></div>
 
   <div class="padding border-bottom">
     <ul class="search" style="padding-left:10px;">
-      <li><a class="button border-main icon-plus-square-o" href="user_add.html">添加用户</a></li>
+      <li><a class="button border-main icon-plus-square-o" href="role_add.html">添加角色</a></li>
       <li>搜索：</li>
-      <if condition="$iscid eq 1">
-        <li>
-          <select name="cid" class="input" style="width:200px; line-height:17px;"
-                  onchange="changesearch()">
-            <option value="">请选择角色</option>
-            <option value="">管理员</option>
-            <option value="">销售经理</option>
-          </select>
-        </li>
-        <li>
-          <select name="cid" class="input" style="width:200px; line-height:17px;"
-                  onchange="changesearch()">
-            <option value="">请选择部门</option>
-            <option value="">市场部</option>
-            <option value="">销售部</option>
-            <option value="">人事部</option>
-          </select>
-        </li>
-      </if>
+
       <li>
         <input type="text" placeholder="请输入搜索关键字" name="keywords" class="input"
                style="width:250px; line-height:17px;display:inline-block"/>
@@ -50,51 +32,43 @@
     <thead>
     <tr>
       <th width="5%">id</th>
-      <th width="10%">loginId</th>
-      <th width="10%">loginPwd</th>
-      <th width="10%">email</th>
+      <th width="10%">name</th>
+      <th width="10%">description</th>
       <th width="10%">state</th>
-      <th width="10%">role</th>
-      <th width="10%">dept</th>
       <th width="10%">操作</th>
     </tr>
     </thead>
-    <tbody id="userList">
+    <tbody id="roleList">
     <!-- 用户数据将通过Ajax加载进来 -->
     </tbody>
   </table>
 </div>
 
 <script type="text/javascript">
-
   $(document).ready(function() {
     // 页面加载时发送请求获取用户数据
     $.ajax({
-      url: "http://localhost:8080/user/getUsersWithObjects",  // 后端API地址
+      url: "http://localhost:8080/role/getRoles",  // 后端API地址
       type: "GET",
-      dataType: "JSON",  // 返回的数据格式是json
+      dataType: "json",  // 返回的数据格式是json
       success: function(response) {
         // 假设返回的格式是 {code: 200, message: "success", data: [...]}
         if(response.code === 200) {
-          var users = response.data;  // 获取用户数据
-          console.log(users)
-          // 遍历用户数据，并插入到表格中
-          $.each(users, function(index, user) {
-            var userRow = `
-              <tr id="row-${user.id}">
-                <td>${user.id}</td>
-                <td>${user.loginId}</td>
-                <td>${user.loginPwd}</td>
-                <td>${user.email}</td>
-                <td>${user.state}</td>
-                <td>${user.role.name}</td>
-                <td>${user.dept.name}</td>
+          var role = response.data;  // 获取数据
+          // 遍历数据，并插入到表格中
+          $.each(role, function(index, role) {
+            var roleRow = `
+              <tr id="row-${role.id}">
+                <td>${role.id}</td>
+                <td>${role.name}</td>
+                <td>${role.description}</td>
+                <td>${role.state}</td>
                 <td>
                   <div class="button-group">
-                    <a class="button border-main" href="user_edit.html?id=${user.id}">
+                    <a class="button border-main" href="role_edit.html?id=${role.id}">
                     <span class="icon-edit"></span> 修改
                     </a>
-                    <a class="button border-red" onclick="return del(${user.id})">
+                    <a class="button border-red" onclick="return del(${role.id})">
                     <span class="icon-trash-o"></span> 删除
                     </a>
                   </div>
@@ -102,10 +76,10 @@
               </tr>
             `;
             // 将用户行追加到表格中
-            $("#userList").append(userRow);
+            $("#roleList").append(roleRow);
           });
         } else {
-          alert("获取用户数据失败：" + response.message);
+          alert("获取角色数据失败：" + response.message);
         }
       },
       error: function() {
@@ -117,7 +91,7 @@
   function del(id){
     if(confirm("您确定要删除吗?")) {
       $.ajax({
-        url: "http://localhost:8080/user/deleteUser",
+        url: "http://localhost:8080/role/deleteRoleById",
         type: "DELETE",
         data: { id: id },
         success: function() {

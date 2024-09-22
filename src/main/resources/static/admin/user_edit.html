@@ -15,38 +15,35 @@
 <div class="panel admin-panel margin-top">
   <div class="panel-head" id="add"><strong><span class="icon-pencil-square-o"></span>用户管理-修改信息</strong></div>
   <div class="body-content">
-    <form method="post" class="form-x" action="">      
+    <form id="user_form" class="form-x">
       <div class="form-group">
         <div class="label">
-          <label>loginId</label>
+          <label for="loginId">loginId</label>
         </div>
         <div class="field">
-          <input type="text" class="input w80" name="loginId" id="loginId"/>
-          <div class="tips"></div>
-        </div>
-      </div> 
-      <div class="form-group">
-        <div class="label">
-          <label>loginPwd</label>
-        </div>
-        <div class="field">
-          <input type="text" class="input w80" name="loginPwd" id="loginPwd"/>
-          <div class="tips"></div>
+          <input type="text" class="input w80" id="loginId" name="loginId" required placeholder="请输入登录名称"/>
         </div>
       </div>
       <div class="form-group">
         <div class="label">
-          <label>email</label>
+          <label for="loginPwd">loginPwd</label>
         </div>
         <div class="field">
-          <input type="text" class="input w80" name="email" id="email"/>
-          <div class="tips"></div>
+          <input type="text" class="input w80" id="loginPwd" name="loginPwd" required placeholder="请输入密码"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="label">
+          <label for="email">email</label>
+        </div>
+        <div class="field">
+          <input type="email" class="input w80" id="email" name="email" required placeholder="请输入邮箱"/>
         </div>
       </div>
 
       <div class="form-group">
         <div class="label">
-          <label>status</label>
+          <label>state</label>
         </div>
         <div class="field">
           <div class="button-group radio">
@@ -58,48 +55,45 @@
               <span class="icon icon-times"></span>
               <input name="state" value="停用" type="radio">停用
             </label>
-            <p id="state">default</p>
+            <p id="currentState">current value: default</p>
           </div>
         </div>
       </div>
 
       <div class="form-group">
         <div class="label">
-          <label>code</label>
+          <label>role</label>
         </div>
         <div class="field">
-          <div class="button-group-big radio">
-            <label class="button">
-              <span class="icon icon-apple"></span>
-              <input name="code" value="apple" type="radio" checked="checked">apple
-            </label>
-            <label class="button">
-              <span class="icon icon-android"></span>
-              <input name="code" value="android" type="radio">android
-            </label>
-            <label class="button">
-              <span class="icon icon-windows"></span>
-              <input name="code" value="windows" type="radio">windows
-            </label>
-            <label class="button">
-              <span class="icon icon-linux"></span>
-              <input name="code" value="linux" type="radio">linux
-            </label>
-            <p id="code">default</p>
-          </div>
+          <select id="role" class="input w50">
+            <option value=0>请选择角色</option>
+          </select>
+          <br><br><br>
+          <p id="currentRole">current value: default</p>
+          <div class="tips"></div>
         </div>
       </div>
 
       <div class="form-group">
         <div class="label">
-          <label></label>
+          <label>dept</label>
         </div>
         <div class="field">
-          <button class="button bg-main icon-check-square-o" type="submit" id="editButton">更新信息</button>
-          <a class="button bg-main icon-check-square-o" type="submit" href="user_list.html">返回</a>
+          <select id="dept" class="input w50">
+            <option value=0>请选择部门</option>
+          </select>
+          <br><br><br>
+          <p id="currentDept">current value: default</p>
+          <div class="tips"></div>
         </div>
       </div>
 
+      <div class="form-group">
+        <div class="field">
+          <button id="editButton" class="button bg-main icon-check-square-o" type="button"> 提交</button>
+          <button class="button bg-main icon-check-square-o" type="button" onclick="javascript:history.back();"> 返回</button>
+        </div>
+      </div>
     </form>
   </div>
 </div>
@@ -108,43 +102,96 @@
   const urlParams = new URLSearchParams(window.location.search);
   const thisId = urlParams.get("id");
 
-  $.ajax({
-    url: "http://localhost:8080/user/selectUser",
-    type: "GET",
-    data: {id: thisId},
-    dataType: "JSON",
-    success: function (response){
-      if (response.code === 200){
-        var user = response.data;
-        $("#loginId").val(user.loginId);
-        $("#loginPwd").val(user.loginPwd);
-        $("#email").val(user.email);
-        $("#state").text("当前值："+user.state);
-        $("#code").text("当前值："+user.code);
-      }
-    }
-  });
+  $(function (){
+    loadUser();
+    loadRoles();
+    loadDept();
+    submit();
+  })
 
-  $("#editButton").on("click", function() {
-    event.preventDefault();  // 阻止表单的默认提交行为
-    var updateUser = {
-      id: thisId,
-      loginId: $("#loginId").val(),
-      loginPwd: $("#loginPwd").val(),
-      email: $("#email").val(),
-      state: $("input[name='state']:checked").val(),
-      code: $("input[name='code']:checked").val()
-    };
+  function loadUser() {
     $.ajax({
-      url: "http://localhost:8080/user/updateUser",
-      type: "PUT",
-      contentType: "application/json",  // 设置内容类型为JSON
-      data: JSON.stringify(updateUser),   // 将数据转换为JSON格式
+      url: "http://localhost:8080/user/selectUserWithObjectsById",
+      type: "GET",
+      data: {id: thisId},
       dataType: "JSON",
-    })
-    window.location.replace("user_list.html")
+      success: function (response){
+        if (response.code === 200){
+          var user = response.data;
+          $("#loginId").val(user.loginId);
+          $("#loginPwd").val(user.loginPwd);
+          $("#email").val(user.email);
+          $("#currentState").text("当前值："+user.state);
+          $("#currentRole").text("当前值："+user.role.name);
+          $("#currentDept").text("当前值："+user.dept.name);
+        }
+      }
+    });
+  }
 
-  });
+  function loadRoles() {
+    $.ajax({
+      url: "http://localhost:8080/role/getRoles",
+      type: "GET",
+      dataType: "JSON",
+      success: function (response) {
+        var roles = response.data;
+        roles.forEach(function (role) {
+          $("#role").append(
+                  `<option value='${role.id}'>${role.name}</option>`
+          )
+        })
+      },
+      error: function (){
+        alert("role加载失败")
+      }
+    })
+  }
+
+  function loadDept(){
+    $.ajax({
+      url: "http://localhost:8080/department/getDepartments",
+      type: "GET",
+      dataType: "JSON",
+      success: function (response) {
+        var depts = response.data;
+        depts.forEach(function (dept) {
+          $("#dept").append(
+                  `<option value='${dept.id}'>${dept.name}</option>`
+          )
+        })
+      },
+      error: function (){
+        alert("role加载失败")
+      }
+    })
+  }
+  
+  function submit() {
+    $("#editButton").on("click", function(event) {
+      event.preventDefault();  // 阻止表单的默认提交行为
+      var updateUser = {
+        id: thisId,
+        loginId: $("#loginId").val(),
+        loginPwd: $("#loginPwd").val(),
+        email: $("#email").val(),
+        state: $("input[name='state']:checked").val(),
+        roleId: $("#role").val(),
+        deptId: $("#dept").val()
+      };
+      $.ajax({
+        url: "http://localhost:8080/user/updateUser",
+        type: "PUT",
+        contentType: "application/json",  // 设置内容类型为JSON
+        data: JSON.stringify(updateUser),   // 将数据转换为JSON格式
+        dataType: "JSON",
+      })
+      window.location.href="user_list.html"
+      // window.location.reload()
+    });
+  }
+
+
 
 </script>
 

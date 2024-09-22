@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan("io.yaqi.hrsystem.dao.mapper")
+@MapperScan(basePackages = "io.yaqi.hrsystem.dao")
 public class HrSystemApplication {
 
     public static void main(String[] args) {

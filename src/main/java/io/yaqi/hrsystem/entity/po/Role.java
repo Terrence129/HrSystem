@@ -1,40 +1,34 @@
-package io.yaqi.hrsystem.dao.entity;
+package io.yaqi.hrsystem.entity.po;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
- * <p>
- *  huhu
- * </p>
- *
  * @author chenyaqi
- * @date 2024/09/13
- */
+ * @Description 角色实体类
+ * @Date 2024/9/19 14:37
+ * @Param
+ **/
+
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class User implements Serializable {
+@NoArgsConstructor
+public class Role implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    private String loginId;
+    private String name;
 
-    private String loginPwd;
-
-    private String email;
+    private String description;
 
     private String state;
-
-    private String code;
-
 
 }

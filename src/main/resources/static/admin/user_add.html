@@ -44,7 +44,7 @@
 
             <div class="form-group">
                 <div class="label">
-                    <label>status</label>
+                    <label>state</label>
                 </div>
                 <div class="field">
                     <div class="button-group radio">
@@ -62,27 +62,27 @@
 
             <div class="form-group">
                 <div class="label">
-                    <label>code</label>
+                    <label>role</label>
                 </div>
                 <div class="field">
-                    <div class="button-group-big radio">
-                        <label class="button">
-                            <span class="icon icon-apple"></span>
-                            <input name="code" value="apple" type="radio">apple
-                        </label>
-                        <label class="button">
-                            <span class="icon icon-android"></span>
-                            <input name="code" value="android" type="radio">android
-                        </label>
-                        <label class="button">
-                            <span class="icon icon-windows"></span>
-                            <input name="code" value="windows" type="radio">windows
-                        </label>
-                        <label class="button">
-                            <span class="icon icon-linux"></span>
-                            <input name="code" value="linux" type="radio">linux
-                        </label>
-                    </div>
+                    <select id="role" class="input w50">
+                        <option value=0>请选择角色</option>
+
+                    </select>
+                    <div class="tips"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="label">
+                    <label>dept</label>
+                </div>
+                <div class="field">
+                    <select id="dept" class="input w50">
+                        <option value=0>请选择部门</option>
+
+                    </select>
+                    <div class="tips"></div>
                 </div>
             </div>
 
@@ -97,7 +97,51 @@
 </div>
 
 <script>
-    $(document).ready(function () {
+    $(function (){
+        loadRoles();
+        loadDept();
+        submit();
+    })
+
+    function loadRoles() {
+        $.ajax({
+            url: "http://localhost:8080/role/getRoles",
+            type: "GET",
+            dataType: "JSON",
+            success: function (response) {
+                var roles = response.data;
+                roles.forEach(function (role) {
+                    $("#role").append(
+                        `<option value='${role.id}'>${role.name}</option>`
+                    )
+                })
+            },
+            error: function (){
+                alert("role加载失败")
+            }
+        })
+    }
+
+    function loadDept(){
+        $.ajax({
+            url: "http://localhost:8080/department/getDepartments",
+            type: "GET",
+            dataType: "JSON",
+            success: function (response) {
+                var depts = response.data;
+                depts.forEach(function (dept) {
+                    $("#dept").append(
+                        `<option value='${dept.id}'>${dept.name}</option>`
+                    )
+                })
+            },
+            error: function (){
+                alert("role加载失败")
+            }
+        })
+    }
+
+    function submit(){
         // 阻止默认提交，并使用AJAX提交表单
         $("#submitBtn").on("click", function () {
             var newUser = {
@@ -105,8 +149,10 @@
                 loginPwd: $("#loginPwd").val(),
                 email: $("#email").val(),
                 state: $("input[name='state']:checked").val(),
-                code: $("input[name='code']:checked").val()
+                roleId: $("#role").val(),
+                deptId: $("#dept").val()
             };
+            console.log(JSON.stringify(newUser))
 
             $.ajax({
                 url: "http://localhost:8080/user/addUser",
@@ -123,7 +169,7 @@
                 }
             });
         });
-    });
+    }
 
 </script>
 

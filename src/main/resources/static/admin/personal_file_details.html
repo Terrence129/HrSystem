@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="renderer" content="webkit">
+  <title>档案详情</title>
+  <link rel="stylesheet" href="css/pintuer.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <script src="js/jquery.js"></script>
+  <script src="js/pintuer.js"></script>
+  <style>
+    .details-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .details-table th, .details-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+
+    .details-table th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+<div class="panel admin-panel">
+  <div class="panel-head" id="details">
+    <strong>
+      <span class="icon-info-circle"></span>档案详情
+      <a class="button bg-main icon-check-square-o" type="submit" href="personal_file_list.html">返回</a>
+    </strong>
+  </div>
+  <div class="body-content">
+    <table class="details-table">
+      <thead>
+      <tr>
+        <th>字段</th>
+        <th>内容</th>
+      </tr>
+      </thead>
+      <tbody id="details-body">
+      <!-- 数据将通过 JavaScript 动态插入 -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  $(function (){
+    loadFileDetails();
+  });
+
+  function loadFileDetails() {
+    $.ajax({
+      url: "http://localhost:8080/personalFile/selectFileWithObjectsById", // 替换为实际接口
+      type: "GET",
+      data: {id: sessionStorage.getItem("detailsId")},
+      dataType: "JSON",
+      success: function (response) {
+        if (response.data) {
+          const file = response.data;
+          if (file.dept === null){
+            var dept_name = "未知部门"
+          }else{
+            var dept_name = file.dept.name
+          }
+          if (file.role === null){
+            var role_name = "未知角色"
+          }else{
+            var role_name = file.role.name
+          }
+          const detailsBody = $("#details-body");
+          detailsBody.append(`<tr><td>档案编码</td><td>${file.code}</td></tr>`);
+          detailsBody.append(`<tr><td>姓名</td><td>${file.name}</td></tr>`);
+          detailsBody.append(`<tr><td>性别</td><td>${file.gender}</td></tr>`);
+          detailsBody.append(`<tr><td>电子邮箱</td><td>${file.email}</td></tr>`);
+          detailsBody.append(`<tr><td>电话号码</td><td>${file.phone_number}</td></tr>`);
+          detailsBody.append(`<tr><td>部门</td><td>${dept_name}</td></tr>`);
+          detailsBody.append(`<tr><td>角色</td><td>${role_name}</td></tr>`);
+          detailsBody.append(`<tr><td>员工状态</td><td>${file.staff_state}</td></tr>`);
+          detailsBody.append(`<tr><td>审核状态</td><td>${file.audit_state}</td></tr>`);
+          detailsBody.append(`<tr><td>身份证号码</td><td>${file.id_number}</td></tr>`);
+          detailsBody.append(`<tr><td>住址</td><td>${file.address}</td></tr>`);
+          detailsBody.append(`<tr><td>户口所在地</td><td>${file.domicile}</td></tr>`);
+          detailsBody.append(`<tr><td>毕业院校</td><td>${file.graduate_from}</td></tr>`);
+          detailsBody.append(`<tr><td>专业</td><td>${file.major}</td></tr>`);
+          detailsBody.append(`<tr><td>额外信息</td><td>${file.extra_info}</td></tr>`);
+          detailsBody.append(`<tr><td>建档日期</td><td>${formatDateTime(file.create_date)}</td></tr>`);
+        } else {
+          alert("未找到档案信息");
+        }
+      },
+      error: function (){
+        alert("加载档案信息失败");
+      }
+    });
+  }
+
+  function formatDateTime(dateTimeStr) {
+    // 创建 Date 对象并将字符串转换为本地时间
+    var date = new Date(dateTimeStr);
+
+    // 获取各部分时间信息
+    var year = date.getFullYear();
+    var month = ('0' + (date.getMonth() + 1)).slice(-2); // 补零
+    var day = ('0' + date.getDate()).slice(-2);
+    var hours = ('0' + date.getHours()).slice(-2);
+    var minutes = ('0' + date.getMinutes()).slice(-2);
+    var seconds = ('0' + date.getSeconds()).slice(-2);
+
+    // 返回格式化的时间字符串
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
+</script>
+
+</body>
+</html>

@@ -1,7 +1,8 @@
 package io.yaqi.hrsystem.controller;
 
-import io.yaqi.hrsystem.dao.entity.User;
+import io.yaqi.hrsystem.entity.po.User;
 import io.yaqi.hrsystem.entity.req.UserLoginReq;
+import io.yaqi.hrsystem.entity.req.UserReq;
 import io.yaqi.hrsystem.service.face.UserServiceFace;
 import io.yaqi.hrsystem.utils.ResponseResult;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +28,8 @@ public class UserController {
     private final UserServiceFace userServiceFace;
 
     @PostMapping("/addUser")
-    public Object addUser(@RequestBody User user) {
-        return ResponseResult.success(userServiceFace.addUser(user));
+    public Object addUser(@RequestBody UserReq req) {
+        return ResponseResult.success(userServiceFace.addUser(req));
     }
 
     @GetMapping("/getUsers")
@@ -55,5 +56,15 @@ public class UserController {
     @PostMapping("/login")
     public Object userLogin(@RequestBody UserLoginReq req) throws LoginException {
         return ResponseResult.success(userServiceFace.userLogin(req), "登录成功", 200);
+    }
+
+    @GetMapping("/getUsersWithObjects")
+    public Object getUsersWithObjects() {
+        return ResponseResult.success(userServiceFace.getUsersWithObjects());
+    }
+
+    @GetMapping("/selectUserWithObjectsById")
+    public Object selectUserWithObjectsById(@RequestParam Integer id) {
+        return ResponseResult.success(userServiceFace.selectUserWithObjectsById(id));
     }
 }

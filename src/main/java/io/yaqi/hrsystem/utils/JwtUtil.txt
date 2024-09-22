@@ -1,0 +1,182 @@
+package io.yaqi.hrsystem.utils;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import io.yaqi.hrsystem.entity.po.User;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Value;
+
+import javax.crypto.SecretKey;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+
+/**
+ * @author chenyaqi
+ * @Description jwt工具类
+ * @Date 2024/9/20 09:58
+ * @Param
+ **/
+
+
+public class JwtUtil {
+
+    @Value("${jwt.tokenHeader}")
+    private String JWT_TOKEN_HEADER;
+    @Value("${jwt.secret}")
+    private String JWT_SECRET;
+    @Value("${jwt.expiration}")
+    private Long JWT_EXPIRATION;
+    @Value("${jwt.tokenHead}")
+    private String JWT_TOKEN_HEAD;
+
+    @Test
+    public void jwtTest(){
+        // JWT头部分信息【Header】
+        Map<String, Object> header = new HashMap<>();
+        header.put("alg", "HS256");
+        header.put("typ", "JWT");
+
+        // 载核【Payload】
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("sub", "1234567890");
+        payload.put("name","John Doe");
+        payload.put("admin",true);
+
+        // 声明Token失效时间
+        Calendar instance = Calendar.getInstance();
+        instance.add(Calendar.SECOND,300);  // 300s
+
+        SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+
+        // 生成Token
+        String token = Jwts.builder()
+                .setHeader(header)  // 设置Header
+                .setClaims(payload)  // 设置载核
+                .setExpiration(instance.getTime())  // 设置生效时间
+                .signWith(SignatureAlgorithm.HS256, JWT_SECRET)  // 签名,这里采用私钥进行签名,不要泄露了自己的私钥信息
+                .compact();  // 压缩生成xxx.xxx.xxx
+
+        System.out.println(token);
+    }
+
+    /**
+     * 根据负责生成JWT的token
+     */
+    private String generateToken(Map<String, Object> claims) {
+        return Jwts.builder()
+                .setClaims(claims)
+                .setExpiration(generateExpirationDate())
+                .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
+                .compact();
+    }
+
+    /**
+     * 生成token的过期时间
+     */
+    private Date generateExpirationDate() {
+        return new Date(System.currentTimeMillis() + JWT_EXPIRATION * 1000);
+    }
+
+    /**
+     * 从token中获取登录用户名
+     */
+    public String getUserNameFromToken(String token) {
+        String username;
+        try {
+            Claims claims = getClaimsFromToken(token);
+            username = claims.getSubject();
+        } catch (Exception e) {
+            username = null;
+        }
+        return username;
+    }
+
+    /**
+     * 验证token是否还有效
+     *
+     * @param token       客户端传入的token
+     * @param userDetails 从数据库中查询出来的用户信息
+     */
+    public boolean validateToken(String token, User userDetails) {
+        String username = getUserNameFromToken(token);
+        return username.equals(userDetails.getId()) && !isTokenExpired(token);
+    }
+
+    /**
+     * 判断token是否已经失效
+     */
+    private boolean isTokenExpired(String token) {
+        Date expiredDate = getExpiredDateFromToken(token);
+        return expiredDate.before(new Date());
+    }
+
+    /**
+     * 从token中获取过期时间
+     */
+    private Date getExpiredDateFromToken(String token) {
+        Claims claims = getClaimsFromToken(token);
+        return claims.getExpiration();
+    }
+
+    /**
+     * 根据用户信息生成token
+     */
+    public String generateToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
+        claims.put(CLAIM_KEY_CREATED, new Date());
+        return generateToken(claims);
+    }
+
+    /**
+     * 当原来的token没过期时是可以刷新的
+     *
+     * @param oldToken 带tokenHead的token
+     */
+    public String refreshHeadToken(String oldToken) {
+        if(StrUtil.isEmpty(oldToken)){
+            return null;
+        }
+        String token = oldToken.substring(tokenHead.length());
+        if(StrUtil.isEmpty(token)){
+            return null;
+        }
+        //token校验不通过
+        Claims claims = getClaimsFromToken(token);
+        if(claims==null){
+            return null;
+        }
+        //如果token已经过期，不支持刷新
+        if(isTokenExpired(token)){
+            return null;
+        }
+        //如果token在30分钟之内刚刷新过，返回原token
+        if(tokenRefreshJustBefore(token,30*60)){
+            return token;
+        }else{
+            claims.put(CLAIM_KEY_CREATED, new Date());
+            return generateToken(claims);
+        }
+    }
+
+    /**
+     * 判断token在指定时间内是否刚刚刷新过
+     * @param token 原token
+     * @param time 指定时间（秒）
+     */
+    private boolean tokenRefreshJustBefore(String token, int time) {
+        Claims claims = getClaimsFromToken(token);
+        Date created = claims.get(CLAIM_KEY_CREATED, Date.class);
+        Date refreshDate = new Date();
+        //刷新时间在创建时间的指定时间内
+        if(refreshDate.after(created)&&refreshDate.before(DateUtil.offsetSecond(created,time))){
+            return true;
+        }
+        return false;
+    }
+}

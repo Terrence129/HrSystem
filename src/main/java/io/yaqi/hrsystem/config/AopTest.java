@@ -24,12 +24,12 @@ public class AopTest {
 
     @Before("pointCut()")
     public void before(JoinPoint joinPoint) {
-        log.info("这是{}的before", joinPoint.getSignature().getName());
+        log.info("{}的before", joinPoint.getSignature().getName());
     }
 
     @After("pointCut()")
     public void after(JoinPoint joinPoint) {
-        log.info("这是{}的after", joinPoint.getSignature().getName());
+        log.info("{}的after", joinPoint.getSignature().getName());
     }
 
 //    @Around("pointCut()")

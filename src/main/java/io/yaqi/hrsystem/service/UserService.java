@@ -1,6 +1,6 @@
 package io.yaqi.hrsystem.service;
 
-import io.yaqi.hrsystem.dao.entity.User;
+import io.yaqi.hrsystem.entity.po.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**

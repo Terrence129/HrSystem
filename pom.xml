@@ -15,6 +15,8 @@
         <junit.version>4.13.2</junit.version>
         <mybatis-plus.version>3.5.6</mybatis-plus.version>
         <mybatis-plus-generator.version>3.5.1</mybatis-plus-generator.version>
+        <java-jwt.version>3.10.3</java-jwt.version>
+        <jjwt.version>0.12.3</jjwt.version>
 
     </properties>
     <dependencies>
@@ -46,7 +48,6 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
-            <scope>test</scope>
         </dependency>
 
         <!-- lombok -->
@@ -55,7 +56,7 @@
             <artifactId>lombok</artifactId>
         </dependency>
 
-        <!-- mybatis -->
+        <!-- mybatis 相关依赖-->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
@@ -82,6 +83,12 @@
             <version>${spring-boot.version}</version>
         </dependency>
 
+        <!-- JWT相关依赖 -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
 
     </dependencies>
 
