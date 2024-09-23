@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="renderer" content="webkit">
+<title>简历管理</title>
+<link rel="stylesheet" href="css/pintuer.css">
+<link rel="stylesheet" href="css/admin.css">
+<script src="js/jquery.js"></script>
+<script src="js/pintuer.js"></script>
+</head>
+<body>
+<div class="panel admin-panel">
+  <div class="panel-head"><strong class="icon-reorder">简历管理-简历列表</strong></div>
+  <div class="padding border-bottom">
+    <li><a class="button border-main icon-plus-square-o" href="resume_add.html">添加简历</a></li>
+  </div>
+  <table class="table table-hover text-center">
+    <thead>
+      <tr>
+        <th width="5%">姓名</th>
+        <th width="10%">性别</th>
+        <th width="10%">备注</th>
+        <th width="10%">意向岗位</th>
+        <th width="10%">投递时间</th>
+        <th width="10%">操作</th>
+      </tr>
+    </thead>
+
+    <tbody id="resumeList">
+      <tr>
+        <td>陈亚骐</td>
+        <td>男</td>
+        <td>会Java</td>
+        <td><a href="position_details.html">2131312</a></td>
+        <td>2024-9-22</td>
+        <td><div class="button-group"> <a class="button border-main" href="#"><span class="icon-edit"></span> 修改</a> <a class="button border-red" href="javascript:void(0)" onclick="return del(1,2)"><span class="icon-trash-o"></span> 删除</a> </div></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<script type="text/javascript">
+
+  $(function (){
+    loadResume()
+  })
+
+  function loadResume() {
+    $.ajax({
+      url: "http://localhost:8080/resume/getResumesWithObjects",
+      type: "GET",
+      dataType: "JSON",
+      success: function (response) {
+        if (response.code === 200){
+          $("#resumeList tr:first").remove()
+          $.each(response.data, function (index, resume) {
+            console.log(111)
+
+            var resumeRow = `
+            <tr>
+              <td>${resume.name}</td>
+              <td>${resume.gender}</td>
+              <td>${resume.extra_info}</td>
+              <td><a class="icon-clipboard text-big" href="#" onclick="return positionDetails(${resume.intended_position.id})">${resume.intended_position.code}</a></td>
+              <td>${formatDateTime(resume.create_date)}</td>
+              <td>
+                <div class="button-group">
+                  <a class="button border-main" href="#" onclick="return operation(${resume.id}, '${resume.name}', '${resume.intended_position.dept.name}', '${resume.intended_position.role.name}')">
+                    <span class="icon-check"></span>录取/拒绝
+                  </a>
+                  <a class="button border-green" href="#" onclick=" return resumeDetails(${resume.id})">
+                    <span class="icon-search"></span>明细
+                  </a>
+                </div>
+              </td>
+            </tr>
+            `;
+            $("#resumeList").append(resumeRow);
+
+          })
+        }
+      }
+    })
+  }
+
+  function formatDateTime(dateTimeStr) {
+    // 创建 Date 对象并将字符串转换为本地时间
+    var date = new Date(dateTimeStr);
+
+    // 获取各部分时间信息
+    var year = date.getFullYear();
+    var month = ('0' + (date.getMonth() + 1)).slice(-2); // 补零
+    var day = ('0' + date.getDate()).slice(-2);
+    var hours = ('0' + date.getHours()).slice(-2);
+    var minutes = ('0' + date.getMinutes()).slice(-2);
+    var seconds = ('0' + date.getSeconds()).slice(-2);
+
+    // 返回格式化的时间字符串
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
+
+  function positionDetails(thisId){
+    sessionStorage.setItem("positionDetailsId", thisId)
+    location.href="position_details.html"
+  }
+
+  function resumeDetails(thisId){
+    sessionStorage.setItem("resumeDetailsId", thisId)
+    location.href="resume_details.html"
+  }
+
+  function operation(thisId, thisName, thisDept, thisRole) {
+    sessionStorage.setItem("admitResumeId", thisId)
+    sessionStorage.setItem("name", thisName)
+    sessionStorage.setItem("dept", thisDept)
+    sessionStorage.setItem("role", thisRole)
+    location.href="admission_add.html"
+  }
+
+  function del(thisId) {
+    if(confirm("您确定要删除吗?")){
+      $.ajax({
+        url: "http://localhost:8080/resume/deleteResumeById",
+        type: "DELETE",
+        data: {id: thisId},
+        dataType: "JSON",
+        success: function (response) {
+          if (response.code === 200){
+            console.log(response.data)
+            alert("删除成功！ " + response.data)
+            location.reload()
+          }else {
+            alert("删除失败" + response.code)
+          }
+        },
+        error: function () {
+          alert("删除失败")
+        }
+      })
+    }
+  }
+
+</script>
+</body>
+</html>

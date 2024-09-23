@@ -16,6 +16,26 @@
   <div class="panel-head"><strong class="icon-reorder">人事管理-人事档案管理</strong></div>
   <div class="padding border-bottom">
     <li><a class="button border-main icon-plus-square-o" href="personal_file_add.html">添加档案</a></li>
+    <li>搜索：</li>
+    <if condition="$iscid eq 1">
+      <li>
+        <select name="role_id" id="role" class="input" style="width:200px; line-height:17px;">
+          <option value=0>请选择角色</option>
+
+        </select>
+      </li>
+      <li>
+        <select name="dept_id" id="dept" class="input" style="width:200px; line-height:17px;">
+          <option value=0>请选择部门</option>
+
+        </select>
+      </li>
+    </if>
+    <li>
+      <input type="text" placeholder="请输入搜索关键字" id="keyword" class="input"
+             style="width:250px; line-height:17px;display:inline-block"/>
+      <button class="button border-main icon-search" id="keywordButton">搜索</button>
+    </li>
   </div>
   <table class="table table-hover text-center">
 
@@ -66,7 +86,48 @@
 
   $(function (){
     loadFile();
+    loadDept()
+    loadRoles()
+    search()
   })
+
+  function loadRoles() {
+    $.ajax({
+      url: "http://localhost:8080/role/getRoles",
+      type: "GET",
+      dataType: "JSON",
+      success: function (response) {
+        var roles = response.data;
+        roles.forEach(function (role) {
+          $("#role").append(
+                  `<option value=${role.id}>${role.name}</option>`
+          )
+        })
+      },
+      error: function (){
+        alert("role加载失败")
+      }
+    })
+  }
+
+  function loadDept(){
+    $.ajax({
+      url: "http://localhost:8080/department/getDepartments",
+      type: "GET",
+      dataType: "JSON",
+      success: function (response) {
+        var depts = response.data;
+        depts.forEach(function (dept) {
+          $("#dept").append(
+                  `<option value=${dept.id}>${dept.name}</option>`
+          )
+        })
+      },
+      error: function (){
+        alert("role加载失败")
+      }
+    })
+  }
 
   function loadFile() {
     $.ajax({
@@ -170,6 +231,72 @@
         }
       })
     }
+  }
+
+  function search() {
+    $("#keywordButton").on("click", function (event) {
+      event.preventDefault();
+
+      // 获取输入的值，确保是调用 val() 方法
+      let role_id = $("#role").val() !== "0" ? $("#role").val() : null;
+      let dept_id = $("#dept").val() !== "0" ? $("#dept").val() : null;
+      let key_word = $("#keyword").val() ? $("#keyword").val() : null;
+
+      console.log(role_id + "=" + dept_id+ "=" + key_word);
+
+      // 使用AJAX请求传递参数
+      $.ajax({
+        url: "http://localhost:8080/personalFile/searchFilesByParams",
+        type: "GET",
+        data: {
+          deptId: dept_id,
+          roleId: role_id,
+          name: key_word
+        },
+        dataType: "JSON",
+        success: function (response) {
+          var result = response.data;
+          console.log(result);
+          $("#fileList").empty()
+          $.each(result, function(index, file) {
+            console.log(file)
+            var userRow = `
+              <tr>
+              <td>${file.code}</td>
+              <td>${file.name}</td>
+              <td>${file.gender}</td>
+              <td>${file.dept.name}</td>
+              <td>${file.role.name}</td>
+              <td>${formatDateTime(file.create_date)}</td>
+              <td>${file.audit_state}</td>
+              <td>${file.staff_state}</td>
+              <td>
+                <div class="button-group">
+                  <a class="button border-main" href="#" onclick="return edit(${file.id})">
+                    <span class="icon-edit"></span>修改
+                  </a>
+                  <a class="button border-green" href="#" onclick="return details(${file.id})">
+                    <span class="icon-search"></span>明细
+                  </a>
+                  <a class="button border-red" href="#" onclick="return del(${file.id})">
+                    <span class="icon-trash-o"></span> 删除
+                  </a>
+                </div>
+              </td>
+            </tr>
+            `;
+            // 将用户行追加到表格中
+            $("#fileList").append(userRow);
+          });
+        },
+        error: function (xhr, status, error) {
+          console.error("AJAX 请求失败");
+          console.error("状态码:", xhr.status);           // 打印状态码
+          console.error("响应文本:", xhr.responseText);   // 打印服务器返回的错误信息
+          console.error("错误类型:", error);             // 打印错误类型
+        }
+      });
+    });
   }
 
 </script>

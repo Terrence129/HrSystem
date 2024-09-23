@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="renderer" content="webkit">
+  <title>添加简历</title>
+  <link rel="stylesheet" href="css/pintuer.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <script src="js/jquery.js"></script>
+  <script src="js/pintuer.js"></script>
+  <style>
+    .form-x {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .form-group {
+      width: 50%;
+      padding-right: 15px;
+      box-sizing: border-box;
+    }
+
+    .form-group:nth-child(odd) {
+      padding-left: 15px;
+    }
+
+    .form-group .label {
+      width: 100px;
+    }
+
+    .form-group .field {
+      flex: 1;
+    }
+
+    .field input, .field select {
+      width: 100%;
+    }
+
+    .field input[type="radio"] {
+      width: auto;
+    }
+
+    /* 控制按钮区域占满一整行 */
+    .form-group.full-width {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+<div class="panel admin-panel">
+  <div class="panel-head" id="add"><strong><span class="icon-pencil-square-o"></span>添加简历</strong></div>
+  <div class="body-content">
+    <form class="form-x">
+
+      <div class="form-group">
+        <div class="label">
+          <label>意向岗位：</label>
+        </div>
+        <div class="field">
+          <select name="intended_position_id" id="intended_position" class="input w50" required>
+            <option value=0>请选择岗位</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="label">
+          <label>姓名：</label>
+        </div>
+        <div class="field">
+          <input type="text" class="input w50" name="name" required />
+          <div class="tips"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="label">
+          <label>性别：</label>
+        </div>
+        <div class="field">
+          <input type="radio" name="gender" value="男" required />男
+          <input type="radio" name="gender" value="女" required />女
+          <input type="radio" name="gender" value="其他" required />其他
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="label">
+          <label>电子邮箱：</label>
+        </div>
+        <div class="field">
+          <input type="email" class="input w50" name="email" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="label">
+          <label>电话号码：</label>
+        </div>
+        <div class="field">
+          <input type="text" class="input w50" name="phone_number" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="label">
+          <label>住址：</label>
+        </div>
+        <div class="field">
+          <input type="text" class="input w50" name="address" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="label">
+          <label>毕业院校：</label>
+        </div>
+        <div class="field">
+          <input type="text" class="input w50" name="graduate_from" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="label">
+          <label>专业：</label>
+        </div>
+        <div class="field">
+          <input type="text" class="input w50" name="major" required />
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <div class="label">
+          <label>额外信息：</label>
+        </div>
+        <div class="field">
+          <textarea class="input w50" name="extra_info"></textarea>
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <div class="field">
+          <button type="submit" class="button bg-main icon-check-square-o" id="submitButton"> 提交</button>
+          <a class="button bg-main icon-check-square-o" type="submit" href="#" onclick="window.history.back()">返回</a>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+  $(function (){
+    loadPosition()
+    addResume()
+  })
+
+  function loadPosition() {
+    $.ajax({
+      url: "http://localhost:8080/position/getPositionsWithObjects",
+      type: "GET",
+      dataType: "JSON",
+      success: function (response) {
+        var positions = response.data;
+        positions.forEach(function (position) {
+          $("#intended_position").append(
+                  `<option value='${position.id}'>${position.dept.name}-${position.role.name}-${position.description}-${position.requirement}</option>`
+          )
+        })
+      },
+      error: function (){
+        alert("role加载失败")
+      }
+    })
+  }
+
+  function addResume() {
+    $("#submitButton").on("click", function (event) {
+      event.preventDefault();
+
+      var newFile = {
+        intended_position_id: $("select[name='intended_position_id']").val(),
+        name: $("input[name='name']").val(),
+        gender: $("input[name='gender']:checked").val(), // 获取选中的性别
+        email: $("input[name='email']").val(),
+        phone_number: $("input[name='phone_number']").val(),
+        address: $("input[name='address']").val(),
+        graduated_from: $("input[name='graduate_from']").val(),
+        major: $("input[name='major']").val(),
+        extra_info: $("textarea[name='extra_info']").val() // 获取额外信息
+      };
+      console.log(newFile)
+      $.ajax({
+        url: "http://localhost:8080/resume/addResume",
+        type: "POST",
+        dataType: "JSON",
+        contentType: "application/json",  // 设置内容类型为JSON
+        data: JSON.stringify(newFile),   // 将数据转换为JSON格式
+        success: function (response) {
+          console.log(response.data)
+          alert(response.msg)
+          location.href="resume_list.html"
+        },
+        error: function (){
+          alert("请求失败")
+        }
+      })
+    })
+  }
+</script>
+
+</body>
+</html>

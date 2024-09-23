@@ -1,12 +1,15 @@
 package io.yaqi.hrsystem.service.face;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.yaqi.hrsystem.dao.PersonalFileMapper;
 import io.yaqi.hrsystem.entity.po.PersonalFile;
 import io.yaqi.hrsystem.entity.req.NewPersonalFileReq;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author chenyaqi
@@ -66,5 +69,27 @@ public class PersonalFileServiceFace {
 
     public Object selectFileWithObjectsById(Integer id){
         return personalFileMapper.selectFileWithObjectsById(id);
+    }
+
+    // 多条件模糊查询
+    public Object searchFilesByParams(Integer roleId, Integer deptId, String name) {
+        QueryWrapper<PersonalFile> queryWrapper = new QueryWrapper<>();
+        if(roleId != null){
+            queryWrapper.eq("role_id", roleId);
+        }
+        if(deptId != null){
+            queryWrapper.eq("dept_id", deptId);
+        }
+        if(name != null){
+            queryWrapper.like("name", name);
+        }
+        if (roleId == null && deptId == null && name == null){
+            return personalFileMapper.selectList(null);
+        }
+        List<Object> result = new ArrayList<>();
+        for (PersonalFile item: personalFileMapper.selectList(queryWrapper)){
+            result.add(personalFileMapper.selectFileWithObjectsById(item.getId()));
+        }
+        return result;
     }
 }

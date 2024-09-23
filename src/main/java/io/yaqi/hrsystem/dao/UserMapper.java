@@ -1,5 +1,6 @@
 package io.yaqi.hrsystem.dao;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.yaqi.hrsystem.entity.po.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.yaqi.hrsystem.entity.resp.UserResp;

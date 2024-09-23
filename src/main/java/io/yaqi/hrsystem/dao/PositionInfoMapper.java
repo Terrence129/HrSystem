@@ -25,4 +25,6 @@ public interface PositionInfoMapper extends BaseMapper<PositionInfo> {
     @ResultMap("PositionResult")
     Object selectPositionWithObjectsById(Integer id);
 
+    @Select("SELECT * FROM position_info WHERE id = #{id}")
+    PositionInfo getPositionInfoById(Integer id);
 }

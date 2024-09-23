@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.yaqi.hrsystem.dao.ResumeMapper">
+
+    <resultMap id="ResumeResult" type="io.yaqi.hrsystem.entity.resp.ResumeResp">
+        <!-- 设置主关键字 -->
+        <id property="id" column="id"/>
+
+        <!-- 其它属性映射 -->
+        <result property="name" column="name"/>
+        <result property="gender" column="gender"/>
+        <result property="phoneNumber" column="phone_number"/>
+        <result property="email" column="email"/>
+        <result property="address" column="address"/>
+        <result property="graduatedFrom" column="graduated_from"/>
+        <result property="major" column="major"/>
+        <result property="createDate" column="create_date"/>
+        <result property="extraInfo" column="extra_info"/>
+
+        <!-- 对应招聘信息关联映射 -->
+        <association property="intendedPosition" column="intended_position_id"
+                     select="io.yaqi.hrsystem.dao.PositionInfoMapper.selectPositionWithObjectsById"
+                     fetchType="lazy"
+                     javaType="io.yaqi.hrsystem.entity.resp.PositionInfoResp"/>
+
+    </resultMap>
+
+</mapper>

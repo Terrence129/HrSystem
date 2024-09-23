@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.yaqi.hrsystem.dao.AdmissionMapper">
+
+    <resultMap id="AdmissionResult" type="io.yaqi.hrsystem.entity.resp.AdmissionResp">
+        <!-- 设置主关键字 -->
+        <id property="id" column="id"/>
+
+        <!-- 其它属性映射 -->
+        <result property="state" column="state"/>
+        <result property="comment" column="comment"/>
+        <result property="createDate" column="create_date"/>
+
+        <!-- 对应招聘信息关联映射 -->
+        <association property="resume" column="resume_id"
+                     select="io.yaqi.hrsystem.dao.ResumeMapper.selectResumeWithObjectsById"
+                     fetchType="lazy"
+                     javaType="io.yaqi.hrsystem.entity.resp.ResumeResp"/>
+
+    </resultMap>
+
+</mapper>

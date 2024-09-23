@@ -55,4 +55,20 @@ public class PersonalFileController {
     public Object selectFileWithObjectsById(@RequestParam Integer id) {
         return ResponseResult.success(personalFileServiceFace.selectFileWithObjectsById(id));
     }
+
+    // 多条件模糊查询
+    @GetMapping("/searchFilesByParams")
+    public Object searchFilesByParams(
+            @RequestParam(required = false) Integer roleId,
+            @RequestParam(required = false) Integer deptId,
+            @RequestParam(required = false) String name) {
+        log.info(roleId + "==" + deptId + "==" + name);
+        if (roleId == null && deptId == null && name == null) {
+            return ResponseResult.success(personalFileServiceFace.getFilesWithObjects());
+        }
+        Object result =  ResponseResult.success(personalFileServiceFace.searchFilesByParams(roleId, deptId, name));
+        log.info(result.toString());
+
+        return result;
+    }
 }

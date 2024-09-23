@@ -1,6 +1,7 @@
 package io.yaqi.hrsystem.service.face;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.yaqi.hrsystem.entity.po.User;
 import io.yaqi.hrsystem.dao.UserMapper;
 import io.yaqi.hrsystem.entity.req.UserLoginReq;
@@ -9,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import javax.security.auth.login.LoginException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -76,5 +79,27 @@ public class UserServiceFace {
 
     public Object selectUserWithObjectsById(Integer id) {
         return userMapper.selectUserWithObjectsById(id);
+    }
+
+    // 多条件模糊查询
+    public Object searchUsersByParams(Integer roleId, Integer deptId, String loginIdKeyword) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        if(roleId != null){
+            queryWrapper.eq("role_id", roleId);
+        }
+        if(deptId != null){
+            queryWrapper.eq("dept_id", deptId);
+        }
+        if(loginIdKeyword != null){
+            queryWrapper.like("login_id", loginIdKeyword);
+        }
+        if (roleId == null && deptId == null && loginIdKeyword == null){
+            return userMapper.selectList(null);
+        }
+        List<Object> result = new ArrayList<>();
+        for (User item: userMapper.selectList(queryWrapper)){
+            result.add(userMapper.selectUserWithObjectsById(item.getId()));
+        }
+        return result;
     }
 }

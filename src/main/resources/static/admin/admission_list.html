@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="renderer" content="webkit">
+<title>录用管理</title>
+<link rel="stylesheet" href="css/pintuer.css">
+<link rel="stylesheet" href="css/admin.css">
+<script src="js/jquery.js"></script>
+<script src="js/pintuer.js"></script>
+</head>
+<body>
+<div class="panel admin-panel">
+  <div class="panel-head"><strong class="icon-reorder">录用管理-录用列表</strong></div>
+  <table class="table table-hover text-center">
+    <thead>
+      <tr>
+        <th width="10%">姓名</th>
+        <th width="10%">部门</th>
+        <th width="10%">角色</th>
+        <th width="10%">录取状态</th>
+        <th width="10%">评价</th>
+        <th width="10%">录取时间</th>
+        <th width="10%">操作</th>
+      </tr>
+    </thead>
+    <tbody id="admissionList">
+    <tr>
+      <td>陈亚骐</td>
+      <td>董事会</td>
+      <td>保洁员</td>
+      <td>录取</td>
+      <td>打扫卫生很干净</td>
+      <td>2024-9-22</td>
+      <td>
+        <div class="button-group">
+          <a class="button border-main" href="editCategory.html">
+            <span class="icon-edit"></span> 修改
+          </a>
+          <a class="button border-red" href="javascript:void(0)" onclick="return del(1,2)">
+            <span class="icon-trash-o"></span> 删除
+          </a>
+        </div>
+      </td>
+    </tr>
+    </tbody>
+
+  </table>
+</div>
+<script type="text/javascript">
+
+  $(function () {
+    loadAdmission()
+  })
+
+  function loadAdmission() {
+    $.ajax({
+      url: "http://localhost:8080/admission/getAdmissionsWithObjects",
+      type: "GET",
+      dataType: "JSON",
+      success: function (response) {
+        if (response.code === 200){
+          console.log(response.data)
+          $("#admissionList tr:first").remove()
+          $.each(response.data, function(index, admission){
+            var admissionRow = `
+            <tr>
+              <td>${admission.resume.name}</td>
+              <td>${admission.resume.intended_position.dept.name}</td>
+              <td>${admission.resume.intended_position.role.name}</td>
+              <td>${admission.state}</td>
+              <td>${admission.comment}</td>
+              <td>${formatDateTime(admission.create_date)}</td>
+              <td>
+                <div class="button-group">
+                  <a class="button border-main" href="#" onclick="return edit(${admission.id})">
+                    <span class="icon-edit"></span>修改
+                  </a>
+                  <a class="button border-green" href="#" onclick="return details(${admission.id})">
+                    <span class="icon-search"></span>明细
+                  </a>
+                  <a class="button border-red" href="#" onclick="return del(${admission.id})">
+                    <span class="icon-trash-o"></span> 删除
+                  </a>
+                </div>
+              </td>
+            </tr>
+            `;
+            $("#admissionList").append(admissionRow);
+          })
+        }
+      },
+      error: function (response) {
+        console.log(response)
+        alert("加载失败" + response)
+      }
+    })
+  }
+
+  function formatDateTime(dateTimeStr) {
+    // 创建 Date 对象并将字符串转换为本地时间
+    var date = new Date(dateTimeStr);
+
+    // 获取各部分时间信息
+    var year = date.getFullYear();
+    var month = ('0' + (date.getMonth() + 1)).slice(-2); // 补零
+    var day = ('0' + date.getDate()).slice(-2);
+    var hours = ('0' + date.getHours()).slice(-2);
+    var minutes = ('0' + date.getMinutes()).slice(-2);
+    var seconds = ('0' + date.getSeconds()).slice(-2);
+
+    // 返回格式化的时间字符串
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
+
+  function del(thisId) {
+    if(confirm("您确定要删除吗?")){
+      $.ajax({
+        url: "http://localhost:8080/admission/deleteAdmissionById",
+        type: "DELETE",
+        data: {id: thisId},
+        dataType: "JSON",
+        success: function (response) {
+          if (response.code === 200){
+            console.log(response.data)
+            alert("删除成功！ " + response.data)
+            location.reload()
+          }else {
+            alert("删除失败" + response.code)
+          }
+        },
+        error: function () {
+          alert("删除失败")
+        }
+      })
+    }
+  }
+
+</script>
+</body>
+</html>

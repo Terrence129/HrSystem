@@ -58,6 +58,7 @@ public class UserController {
         return ResponseResult.success(userServiceFace.userLogin(req), "登录成功", 200);
     }
 
+    // 多表查询
     @GetMapping("/getUsersWithObjects")
     public Object getUsersWithObjects() {
         return ResponseResult.success(userServiceFace.getUsersWithObjects());
@@ -66,5 +67,20 @@ public class UserController {
     @GetMapping("/selectUserWithObjectsById")
     public Object selectUserWithObjectsById(@RequestParam Integer id) {
         return ResponseResult.success(userServiceFace.selectUserWithObjectsById(id));
+    }
+
+    // 多条件模糊查询
+    @GetMapping("/searchUsersByParams")
+    public Object searchUsersByParams(
+            @RequestParam(required = false) Integer roleId,
+            @RequestParam(required = false) Integer deptId,
+            @RequestParam(required = false) String loginIdKeyword) {
+        if (roleId == null && deptId == null && loginIdKeyword == null) {
+            return ResponseResult.success(userServiceFace.getUsersWithObjects());
+        }
+        Object result =  ResponseResult.success(userServiceFace.searchUsersByParams(roleId, deptId, loginIdKeyword));
+        System.out.println(231312321);
+
+        return result;
     }
 }
